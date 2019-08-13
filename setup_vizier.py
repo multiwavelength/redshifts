@@ -1,5 +1,10 @@
 from astropy import units as u
-# List of keywords to have and avoid in searching the Vizier database
+
+# Name of the column used to set the origin of the measurement 
+origin_name = 'Source catalog'
+
+################################################################################
+# # List of keywords to have and avoid in searching the Vizier database
 
 # Keywords we want in the column description for a redshift column
 wanted_keywords_redshift = ['Redshift', 'redshift']

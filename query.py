@@ -140,7 +140,8 @@ def process_catalog(cat, RA, DEC, z):
     final_cat = cat[RA, DEC, z][~cat[z].mask]
     
     # Add Vizier catalog name to the table for future reference
-    final_cat.add_column(Column([cat.meta['name']]*len(final_cat)), name='Source catalog')
+    final_cat.add_column(Column([cat.meta['name']]*len(final_cat)), 
+                         name=sv.origin_name)
     
     # Add to master list of tables
     return final_cat
