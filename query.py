@@ -4,7 +4,7 @@ from astropy.table import Column, QTable, Table, vstack
 from astropy import constants as const
 from astropy import units as u
 
-import setup_vizier as sv
+import setup_astroquery as sa
 
 
 def unwanted_catalogue(cat_name):
@@ -13,7 +13,7 @@ def unwanted_catalogue(cat_name):
     Input: 
         cat_name: name of the catalogue
     """
-    if any(elem in cat_name for elem in sv.banned_catalogues):
+    if any(elem in cat_name for elem in sa.banned_catalogues):
         return True
     else: 
         return False
@@ -27,9 +27,9 @@ def initial_select_columns(desc, col_name):
        desc: test description of the column
        col_name: column name
     """
-    if ( any(elem in desc for elem in sv.wanted_keywords_redshift) and 
-        (not any(elem in desc for elem in sv.banned_keywords)) and
-        (not any(elem in col_name for elem in sv.banned_names)) ):
+    if ( any(elem in desc for elem in sa.wanted_keywords_redshift) and 
+        (not any(elem in desc for elem in sa.banned_keywords)) and
+        (not any(elem in col_name for elem in sa.banned_names)) ):
         return True
     else:
         return False
@@ -40,7 +40,7 @@ def banned_units(col_unit):
     Some columns have units which indicate they are not a redshift measurement
     """
     if ((col_unit is not None) and 
-        (any(elem in col_unit.to_string() for elem in sv.banned_units)) ):
+        (any(elem in col_unit.to_string() for elem in sa.banned_units)) ):
         return True
     else:
         return False
@@ -54,7 +54,7 @@ def vel2redshift(cat, col):
         cat: catalogue
         col: column name in string format
     """
-    if cat[col].unit==sv.vel_unit:
+    if cat[col].unit==sa.vel_unit:
         cat.replace_column(col, cat[col]/const.c.to(cat[col].unit))
     return cat
 
@@ -84,7 +84,7 @@ def select_best_redshift(cat, col_selection):
     # If more than one column were previously selected, choose one.
     if len(col_selection)>1:
         for col in col_selection:
-            if any(elem in cat[col].info.description for elem in sv.hard_selection):
+            if any(elem in cat[col].info.description for elem in sa.hard_selection):
                 return col
         return col_selection[0]
 
@@ -147,14 +147,14 @@ def process_catalog(cat, RA, DEC, z, RAf, DECf):
     
     # Add Vizier catalog name to the table for future reference
     final_cat.add_column(Column([cat.meta['name']]*len(final_cat)), 
-                         name=sv.origin_name)
+                         name=sa.origin_name)
     
     # Add to master list of tables
     return final_cat
 
 
 def query_vizier(name, radius=0.5*u.deg, RA='_RAJ2000', DEC='_DEJ2000', 
-                 RAf=sv.RA, DECf=sv.DEC, z=sv.z):
+                 RAf=sa.RA, DECf=sa.DEC, z=sa.z):
     """
     Use astroquery to query the Vizier catalogue database
     Input:
