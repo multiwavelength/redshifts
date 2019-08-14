@@ -2,6 +2,9 @@ from astropy import units as u
 
 # Name of the column used to set the origin of the measurement 
 origin_name = 'Source catalog'
+# Final names for RA and DEC columns
+RA = 'RA'
+DEC = 'DEC'
 
 ################################################################################
 # # List of keywords to have and avoid in searching the Vizier database

@@ -108,12 +108,14 @@ def column_selection(cat):
     return col_selection
 
 
-def process_catalog(cat, RA, DEC, z):
+def process_catalog(cat, RA, DEC, z, RAf, DECf):
     """
     Take an downloaded Vizier catalogue and extract RA, DEC and a redshift 
     column, if possible
     Input:
         cat: catalog as downloaded from Vizier with all columns in it
+        RA, DEC: names of RA and DEC column in original catalog
+        z, RAf, DECf: final names for the redshift, RA and DEC column
     Output:
         return None if catalog does not contain any useful redshift column or
         a table with 4 columns: RA, DEC, redshift and data origin
@@ -138,6 +140,10 @@ def process_catalog(cat, RA, DEC, z):
     
     # Select only relevant columns: RA, DEC and redshift
     final_cat = cat[RA, DEC, z][~cat[z].mask]
+
+    # Rename the coord columns with chosen names
+    final_cat.rename_column(RA, RAf)
+    final_cat.rename_column(DEC, DECf)
     
     # Add Vizier catalog name to the table for future reference
     final_cat.add_column(Column([cat.meta['name']]*len(final_cat)), 
@@ -147,7 +153,8 @@ def process_catalog(cat, RA, DEC, z):
     return final_cat
 
 
-def query_vizier(name, radius=0.5*u.deg, RA='_RAJ2000', DEC='_DEJ2000', z='z_spec'):
+def query_vizier(name, radius=0.5*u.deg, RA='_RAJ2000', DEC='_DEJ2000', 
+                 RAf=sv.RA, DECf=sv.DEC, z='z_spec'):
     """
     Use astroquery to query the Vizier catalogue database
     Input:
@@ -175,7 +182,7 @@ def query_vizier(name, radius=0.5*u.deg, RA='_RAJ2000', DEC='_DEJ2000', z='z_spe
     # Find whether the catalogue contains relevant information and save the 
     # column with the relevant data
     for cat in cat_list:
-        final_cat = process_catalog(cat, RA, DEC, z)
+        final_cat = process_catalog(cat, RA, DEC, z, RAf, DECf)
         if final_cat is not None:
             table_list.append(final_cat)
 
