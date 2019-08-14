@@ -2,7 +2,8 @@ from astropy import units as u
 
 # Name of the column used to set the origin of the measurement 
 origin_name = 'Source catalog'
-# Final names for RA and DEC columns
+# Final names for redshift, RA and DEC columns
+z = 'z_spec'
 RA = 'RA'
 DEC = 'DEC'
 
@@ -44,3 +45,9 @@ hard_selection = ["spectroscopic", "Spectroscopic"]
 # Velocity unit for column mislabelled as redshift, when they actually contain
 # velocities
 vel_unit = u.km/u.s
+
+################################################################################
+# List of keywords to have and avoid in searching the NED database
+
+# Redshift uncertainty for a redshift measurement to be considered spectroscopic
+uncertainty = 0.002

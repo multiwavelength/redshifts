@@ -154,7 +154,7 @@ def process_catalog(cat, RA, DEC, z, RAf, DECf):
 
 
 def query_vizier(name, radius=0.5*u.deg, RA='_RAJ2000', DEC='_DEJ2000', 
-                 RAf=sv.RA, DECf=sv.DEC, z='z_spec'):
+                 RAf=sv.RA, DECf=sv.DEC, z=sv.z):
     """
     Use astroquery to query the Vizier catalogue database
     Input:
