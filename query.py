@@ -191,3 +191,109 @@ def query_vizier(name, radius=0.5*u.deg, RA='_RAJ2000', DEC='_DEJ2000',
     
     # Return results of the vizier search
     return grand_table
+
+
+def fix_coord_units(cat, RA, DEC):
+    """
+    NED produces RA and DEC column with unrecognized astropy units. Fix them to 
+    actual degrees.
+    Input:
+        cat: catalogue in question in Astropy table format
+        RA, DEC: string names of the columns in question
+    Return:
+        catalogue with correct units
+    """
+    cat[RA].info.unit = u.deg
+    cat[DEC].info.unit = u.deg
+    return cat
+
+
+def filter_ned_cat(cat, RA, DEC):
+    """
+    Filter the NED catalogue to include only sources that have redshift 
+    measurements, remove photometric redshifts labelled as such and remove 
+    groups of sources like clusters. Fix units of RA and DEC.
+    Input:
+        cat: catalogue in question in Astropy table format
+        RA, DEC: string names of the columns for which units need to be fixed
+    Return:
+        catalogue with correct units, with rows containing redshift and without
+        clusters
+    """
+    # Fix units
+    cat = fix_coord_units(cat, RA, DEC)
+    # Select only lines that have a redshift measurement
+    cat = cat[~cat['Redshift'].mask]
+    # Remove Galaxy Clusters
+    cat = cat[~(cat['Type']==b'GClstr')]
+    # Remove redshift values labelled as photometric
+    cat = cat[~(cat['Redshift Flag']==b'PHOT')]
+    return cat
+
+
+def redshift_type(line, RA, DEC, un=sa.uncertainty):
+    """
+    Determine which type of redshift a source has associated with it. We do this
+    by doing a targeted search on each source and checking its redshift 
+    measurements. If there is no such table, or if the error on the redshift
+    measurement is large, then the measurement is either missing or there are
+    very large errors (ie the redshift is photometric). Return the line if the 
+    values are good
+    Input:
+        line: line in original NED batch search
+    Return
+        return line of the table if it contains good spectroscopic redshift; 
+        else, return None
+    """
+    try: 
+        result_table = Ned.get_table(line['Object Name'], table='redshifts')
+    except:
+        return None
+    if any(result_table['Published Redshift Uncertainty']<un):
+        return line[RA, DEC, 'Redshift']
+    else:
+        return None
+
+
+def query_NED(name, radius=0.5*u.deg, RA='RA', DEC='DEC', z='z_spec', 
+                                      RAf=sa.RA, DECf=sa.DEC):
+    """
+    Use astroquery to query the NED database
+    Input:
+        name: name of the source to query region for
+        radius: optional, sets the radius to patrol around maine source
+        RA, DEC: optional, coordinates of RA and DEC columns; defaults to vizier
+                 names which point to RA and DEC homogenized to deg and J2000
+        RAf, DECf, z: name to use for homogenized redshift and coord columns
+    Return:
+        Final table containing 4 columns, RA, DEC, redshift and origin of 
+        redshift measurement, compiled from all data available of Vizier
+    """
+    # Query NED for the region around source within radius
+    cat = Ned.query_region(name, radius=radius)
+    
+    # Filter the catalog, to remove useless rows
+    filtered_cat = filter_ned_cat(cat, RA, DEC)
+    
+    # Initialize a list of table to be appended; These will be table that have
+    # a redshift measurement
+    row_list = []
+    
+    # Do another NED targeted search on each of the targets to check what type
+    # of redshift it has associated
+    for line in filtered_cat:
+        if redshift_type(line, RA, DEC) is not None:
+            row_list.append(line[RA, DEC, 'Redshift'])
+    
+    # Vstack all the lines into a single catalogue
+    final_cat = vstack(row_list)
+    
+    # Rename columns to match general choice
+    final_cat.rename_column('Redshift', z)
+    final_cat.rename_column(RA, RAf)
+    final_cat.rename_column(DEC, DECf)
+    
+    # Add origin column as NED
+    final_cat.add_column(Column(['NED']*len(final_cat)), name=sa.origin_name)
+
+    return final_cat
