@@ -55,7 +55,9 @@ def vel2redshift(cat, col):
         col: column name in string format
     """
     if cat[col].unit==sa.vel_unit:
+        desc = cat[col].info.description
         cat.replace_column(col, cat[col]/const.c.to(cat[col].unit))
+        cat[col].info.description = desc
     return cat
 
 
@@ -90,6 +92,9 @@ def select_best_redshift(cat, col_selection):
 
 
 def column_selection(cat):
+    """
+    Select the columns that could potentially contain redshift information
+    """
     col_selection = []
     for col in cat.colnames:
         desc = cat[col].info.description
