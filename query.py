@@ -384,3 +384,22 @@ def query_NED(name, radius=sa.radius, RA='RA', DEC='DEC', z='z_spec',
     final_cat.add_column(Column(['NED']*len(final_cat)), name=sa.origin_name)
 
     return final_cat
+
+def query_redshift(target):
+    """
+    Perform an astroquery search of NED and Vizier for spectroscopic redshift 
+    measurements. 
+    Input: 
+        target: either source name in string format or Astropy coordinate object
+    Return:
+        stacked table with all redshift measurements. Will most likely contain 
+        duplicated sources
+    """
+    # Query Vizier for redshift columns
+    tab_redshift = query_vizier(target, 'redshift')
+    # Query Vizier for velocity columns
+    tab_velocity = query_vizier(target, 'velocity')
+    # Query NED for redshifts
+    tab_NED = query_NED(target)
+    
+    return vstack([tab_redshift, tab_velocity, tab_NED])
