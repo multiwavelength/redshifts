@@ -236,6 +236,34 @@ def process_catalog(type, cat, RA, DEC, z, RAf, DECf):
     return final_cat
 
 
+def remove_potential_photoz(table, z_col='z_spec'):
+    """
+    Some redshifts in Vizier might still be photometric. Check whether the 
+    values of the redshift has little precision and use this as a proxy for 
+    labelling sources as photometric. Remove all rows consistent with 
+    photometric measurements.
+    Input:
+        table: table that contains redshift measurements
+        z_col: optional name of the redshift column 
+    Return:
+        table without potential photometric redshift
+    """
+    # Add number of rows to a list
+    rows_to_remove = []
+    # Iterate the table
+    for i, z  in enumerate(table[z_col]):
+        # A string of 9's or 0's usually comes from python not being able to 
+        # represent float accurately, so those measurements probably have a lot
+        # let precision than they might look like. Also if the string 
+        # representation of the redshift measurement is short, it means the
+        # measurement does not have a lot of precision; here I remove anything
+        # with less than 2 significant digits.
+        if ('999999' in str(z)) | ('000000' in str(z)) | (len(str(z))<=4):
+            rows_to_remove.append(i)
+    
+    table.remove_rows(rows_to_remove)
+    return table
+
 def query_vizier(name, type, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000', 
                  RAf=sa.RA, DECf=sa.DEC, z=sa.z):
     """
@@ -275,7 +303,10 @@ def query_vizier(name, type, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000',
 
     # Stack all the final catalogues with the relevant data
     grand_table = vstack(table_list)
-    
+
+    # Remove potential photoz's by removing measurements with little precision
+    grand_table = remove_potential_photoz(grand_table)
+
     # Return results of the vizier search
     return grand_table
 
@@ -401,5 +432,5 @@ def query_redshift(target):
     tab_velocity = query_vizier(target, 'velocity')
     # Query NED for redshifts
     tab_NED = query_NED(target)
-    
+
     return vstack([tab_redshift, tab_velocity, tab_NED])
