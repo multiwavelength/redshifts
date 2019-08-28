@@ -406,6 +406,9 @@ def query_NED(name, radius=sa.radius, RA='RA', DEC='DEC', z='z_spec',
             row_list.append(line[RA, DEC, 'Redshift'])
     
     # Vstack all the lines into a single catalogue
+    if not row_list:
+        return None
+
     final_cat = vstack(row_list)
     
     # Rename columns to match general choice
@@ -430,9 +433,17 @@ def query_redshift(target):
     """
     # Query Vizier for redshift columns
     tab_redshift = query_vizier(target, 'redshift')
+    
     # Query Vizier for velocity columns
     tab_velocity = query_vizier(target, 'velocity')
+    
     # Query NED for redshifts
     tab_NED = query_NED(target)
-
-    return vstack([tab_redshift, tab_velocity, tab_NED])
+    
+    # Add table to the list only if it not not empty
+    cat_list = []
+    for t in [tab_redshift, tab_velocity, tab_NED]:
+        if t is not None:
+            cat_list.append(t)
+    
+    return vstack(cat_list)
