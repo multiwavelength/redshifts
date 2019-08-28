@@ -1,7 +1,7 @@
 from astropy import units as u
 
 # Search radius
-radius = 1.0*u.deg
+radius = 0.7*u.deg
 
 # Name of the column used to set the origin of the measurement 
 origin_name = 'Source catalog'
