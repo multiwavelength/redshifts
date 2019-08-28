@@ -5,7 +5,7 @@ from astropy import constants as const
 from astropy import units as u
 
 import setup_astroquery as sa
-
+Ned.TIMEOUT = 100*60
 
 def unwanted_catalogue(cat_name, banned_cat_list):
     """
