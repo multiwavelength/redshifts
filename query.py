@@ -23,34 +23,34 @@ def unwanted_catalogue(cat_name, banned_cat_list):
         return False
 
 
-def set_keywords(type):
+def set_keywords(type1):
     """
     Set the right collections of keywords wanted or banned within different 
     column names and descriptions. This helps select useful column and remove
     unwanted columns.
     Input:
-        type: redshift of velocity
+        type1: redshift of velocity
     Output:
         return the relevant collection of keywords (lists) located possibly in 
         another file
     """
-    if type=='velocity':
+    if type1=='velocity':
         return sa.wanted_keywords_velocity, sa.banned_keywords_velocity, sa.banned_names_velocity
-    if type=='redshift':
+    if type1=='redshift':
         return sa.wanted_keywords_redshift, sa.banned_keywords, sa.banned_names
 
 
-def initial_check(type, desc, col_name):
+def initial_check(type1, desc, col_name):
     """
     Make initial checks that the columns fulfill a set of basic requirements. 
     Input:
-        type: type of redshift search: velocity of redshift
+        type1: type of redshift search: velocity of redshift
         desc: description of the column
         col_name: column name
     Output:
         return True if the column fulfills all requirements; False if not
     """
-    wk, bk, bn = set_keywords(type)
+    wk, bk, bn = set_keywords(type1)
     if ( any(elem in desc for elem in wk) and 
         (not any(elem in desc for elem in bk)) and
         (not any(elem in col_name for elem in bn)) ):
@@ -59,7 +59,7 @@ def initial_check(type, desc, col_name):
         return False
 
 
-def initial_select_columns(type, desc, col_name, unit=None):
+def initial_select_columns(type1, desc, col_name, unit=None):
     """
     Initial selection of column that contain the wanted keywords and none of the 
     unwanted keywords
@@ -67,8 +67,8 @@ def initial_select_columns(type, desc, col_name, unit=None):
        desc: test description of the column
        col_name: column name
     """
-    if initial_check(type, desc, col_name):
-        if wanted_units(type, unit):
+    if initial_check(type1, desc, col_name):
+        if wanted_units(type1, unit):
             return True
         else:
             return False
@@ -76,16 +76,16 @@ def initial_select_columns(type, desc, col_name, unit=None):
         return False
 
 
-def wanted_units(type, unit):
+def wanted_units(type1, unit):
     """
     Some columns have units which indicate they are a velocity measurement
     """
-    if type=='velocity':
+    if type1=='velocity':
         if any(elem == unit for elem in sa.wanted_units_velocity):
             return True
         else: 
             return False
-    if type=='redshift':
+    if type1=='redshift':
         return True
 
 
@@ -151,10 +151,11 @@ def select_best_redshift(cat, col_selection):
         return col_selection[0]
 
 
-def column_selection(type, cat):
+def column_selection(type1, cat):
     """
     Select the columns that could potentially contain redshift information
     Input:
+        type1: redshift of velocity
         cat: catalogue in Astropy table format
     Output:
         selection of columns
@@ -165,7 +166,7 @@ def column_selection(type, cat):
         if banned_units(cat[col].unit):
             continue
         # Make first pass of selecting columns
-        if initial_select_columns(type, desc, cat[col].info.name, cat[col].unit):
+        if initial_select_columns(type1, desc, cat[col].info.name, cat[col].unit):
             # Ignore column that have units not consistent with redshift
             # measurements (like Mpc)
             # If column is velocity, convert to redshift
@@ -176,7 +177,7 @@ def column_selection(type, cat):
     return col_selection
 
 
-def set_unwanted_list(type):
+def set_unwanted_list(type1):
     """
     Set which list of catalogues you want to ban. List can be in an outside file
     Input:
@@ -184,18 +185,18 @@ def set_unwanted_list(type):
     Output:
         return list of catalogue names in string format
     """
-    if type=='redshift':
+    if type1=='redshift':
         return sa.banned_catalogues
-    if type=='velocity':
+    if type1=='velocity':
         return sa.banned_catalogues_velocity
 
 
-def process_catalog(type, cat, RA, DEC, z, RAf, DECf):
+def process_catalog(type1, cat, RA, DEC, z, RAf, DECf):
     """
     Take an downloaded Vizier catalogue and extract RA, DEC and a redshift 
     column, if possible
     Input:
-        type: velocity or redshift search
+        type1: velocity or redshift search
         cat: catalog as downloaded from Vizier with all columns in it
         RA, DEC: names of RA and DEC column in original catalog
         z, RAf, DECf: final names for the redshift, RA and DEC column
@@ -204,11 +205,11 @@ def process_catalog(type, cat, RA, DEC, z, RAf, DECf):
         a table with 4 columns: RA, DEC, redshift and data origin
     """
     # Skip unwanted catalogues
-    if unwanted_catalogue(cat.meta['name'], set_unwanted_list(type)): 
+    if unwanted_catalogue(cat.meta['name'], set_unwanted_list(type1)): 
         return None
     
     # Make a list of potential column that contain redshift information
-    col_selection = column_selection(type, cat)
+    col_selection = column_selection(type1, cat)
     final_z_col = select_best_redshift(cat, col_selection)
     
     # If no relevant redshift column is present, skip the catalog
@@ -264,12 +265,13 @@ def remove_potential_photoz(table, z_col='z_spec'):
     table.remove_rows(rows_to_remove)
     return table
 
-def query_vizier(name, type, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000', 
+def query_vizier(name, type1, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000', 
                  RAf=sa.RA, DECf=sa.DEC, z=sa.z):
     """
     Use astroquery to query the Vizier catalogue database
     Input:
         name: name of the source to query region for
+        type1: redshift of velocity query
         radius: optional, sets the radius to patrol around maine source
         RA, DEC: optional, coordinates of RA and DEC columns; defaults to vizier
                  names which point to RA and DEC homogenized to deg and J2000
@@ -281,10 +283,10 @@ def query_vizier(name, type, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000',
 
     # Setup the column and keywords used for the selection; calculate 
     # homogenised RA and DEC and return unlimited rows
-    if type=='velocity':
+    if type1=='velocity':
         v = Vizier(columns=["**", RA, DEC], ucd="spect.dopplerVeloc*|phys.veloc*", 
                    row_limit=-1)
-    if type=='redshift':
+    if type1=='redshift':
         v = Vizier(columns=["**", RA, DEC], ucd="src.redshift*", row_limit=-1)
 
     # Query a region using source name
@@ -297,7 +299,7 @@ def query_vizier(name, type, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000',
     # Find whether the catalogue contains relevant information and save the 
     # column with the relevant data
     for cat in cat_list:
-        final_cat = process_catalog(type, cat, RA, DEC, z, RAf, DECf)
+        final_cat = process_catalog(type1, cat, RA, DEC, z, RAf, DECf)
         if final_cat is not None:
             table_list.append(final_cat)
 
