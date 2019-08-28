@@ -20,9 +20,14 @@ wanted_keywords_redshift = ['Redshift', 'redshift']
 # Catalogues that have been found to have issues.
 # GLADE: it reports photometric redshifts as redshift, rendering the catalogues
 #        useless
-banned_catalogues = ['glade1', 'glade2']
+banned_catalogues = ['glade1', 'glade2', 'IX/31/wgacat', 'VIII/29A/abelclus', 
+                     'J/A+A/425/367/reflex50', 'J/A+A/425/367/reflex70', 
+                     'VII/283/catalog', 'VII/258/vv10', 'IX/31/wgacat', 
+                     'J/A+A/525/A157', 'J/ApJS/196/11', 'J/A+AS/103/349',
+                     'J/ApJS/146/267', 'VII/259/6dfgs', 'VII/69/catalog',
+                     'J/MNRAS/277/1477', 'J/MNRAS/478/1512']
 
-banned_catalogues_velocity = ['glade1', 'glade2', 'I/348/catalog', 
+banned_catalogues_velocity = ['glade1', 'glade2', 'I/348/catalog', 'J/A+A/525/A157',
         'II/335/galex_ais', 'II/335/table4', 'V/139/sdss9', 'V/147/sdss12', 
         'V/148/morx', 'V/148/morxsupp', 'V/149/dr2', 'V/149/mstars2', 'V/153/dr4', 
         'V/153/astars4', 'V/153/mstars4', 'VII/177/table1', 'VII/190/zg_ori', 
@@ -103,10 +108,11 @@ banned_catalogues_velocity = ['glade1', 'glade2', 'I/348/catalog',
         'J/AJ/125/1817/table3b', 'J/MNRAS/448/2530/tablea1', 'J/MNRAS/348/866/2dfsgpgr', 
         'J/A+A/461/397/tablea1', 'J/ApJ/791/88/table1', 'J/ApJ/708/661/sn', 
         'V/125/obubvbet', 'J/A+A/564/A79/pm_ucac4', 'VIII/11/catalog', 
-        'J/ApJ/698/819/table1', 'J/MNRAS/465/2120/table2', 
-        'J/MNRAS/465/2120/tableb', 'J/ApJS/154/673/table5', 
+        'J/ApJ/698/819/table1', 'J/MNRAS/465/2120/table2', 'J/ApJS/196/11',
+        'J/MNRAS/465/2120/tableb', 'J/ApJS/154/673/table5', 'J/A+AS/103/349',
         'J/ApJ/789/23/table2', 'J/ApJS/234/31/table11', 'V/125/obcat', 
-        'J/A+A/309/749/tablea1', 'J/A+A/504/347/clusters', 'J/AJ/155/181/table1']
+        'J/A+A/309/749/tablea1', 'J/A+A/504/347/clusters', 'J/AJ/155/181/table1',
+        'J/ApJS/146/267', 'J/MNRAS/488/590']
 
 # Keywords in the description of the columns that indicate the column is not 
 # actually a redshift measurement, but something else
@@ -118,7 +124,7 @@ banned_keywords = ['cluster', 'Cluster', 'sigma', 'Sigma', 'Photometric', 'photo
                    'Type of', 'Source of', 'Source for', 'photo-z', 
                    'Display the Object type', 'of the center', 'of the group center',
                    'corrected to the CMB', 'qualifier', 'Reliability of', 
-                   'Peak of', 'Flag', 'source flag', 'FWHM']
+                   'Peak of', 'Flag', 'source flag', 'FWHM', 'Identifier']
 
 # Units in the columns which indicate the column is not a redshift measurement,
 # but something else 
@@ -126,7 +132,7 @@ banned_units = ["Mpc", "Y:M:D", "mag"]
 
 # List of characters in the column name that indicate the column does not 
 # contain a spectroscopic redshift measurement
-banned_names = ["ph", "f_", "n_"]
+banned_names = ["ph", "f_", "n_", "r_", "e_"]
 
 # If the description contains these keywords, select this column over any other
 # one
