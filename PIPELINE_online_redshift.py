@@ -1,14 +1,15 @@
+import os
+import shutil
 import warnings
 warnings.filterwarnings("ignore")
 from astropy.io import fits
-from astropy.table import Column, Table, QTable
+from astropy.table import Column, Table, QTable, vstack
 import astropy.units as u
 import astropy.coordinates as coord
 
 import query as q
 from astroquery.vizier import Vizier
-cluster_table = QTable.read(f'Cluster_properties.fits')
-print(cluster_table)
+import cross_match_utilities as cmu
 
 for cluster in cluster_table[0:1]:
     coords = coord.SkyCoord(cluster['RA'], cluster['DEC'])
