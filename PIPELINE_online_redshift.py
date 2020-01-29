@@ -5,7 +5,7 @@ from astropy.table import QTable
 import astropy.coordinates as coord
 
 import query as q
-
+ 
 # Set the paths where the data will be downloaded
 base_path = f'/home/andra/Desktop/Keep/astroquery'
 data_path = f'{base_path}/clusters'
