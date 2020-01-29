@@ -239,7 +239,7 @@ def process_catalog(type1, cat, RA, DEC, z, RAf, DECf):
     return final_cat
 
 
-def remove_potential_photoz(table, z_col='z_spec'):
+def remove_potential_photoz(table, z_col=sa.z):
     """
     Some redshifts in Vizier might still be photometric. Check whether the 
     values of the redshift has little precision and use this as a proxy for 
@@ -378,7 +378,7 @@ def redshift_type(line, RA, DEC, un=sa.uncertainty):
         return None
 
 
-def query_NED(name, radius=sa.radius, RA='RA', DEC='DEC', z='z_spec', 
+def query_NED(name, radius=sa.radius, RA='RA', DEC='DEC', z=sa.z, 
                                       RAf=sa.RA, DECf=sa.DEC):
     """
     Use astroquery to query the NED database

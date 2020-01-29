@@ -4,9 +4,9 @@ from astropy import units as u
 radius = 0.7*u.deg
 
 # Name of the column used to set the origin of the measurement 
-origin_name = 'Source catalog'
+origin_name = 'Origin'
 # Final names for redshift, RA and DEC columns
-z = 'z_spec'
+z = 'Redshift'
 RA = 'RA'
 DEC = 'DEC'
 
