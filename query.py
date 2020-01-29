@@ -3,9 +3,11 @@ from astroquery.ned import Ned
 from astropy.table import Column, QTable, Table, vstack
 from astropy import constants as const
 from astropy import units as u
+import astropy.coordinates as coord
 
 import setup_astroquery as sa
-Ned.TIMEOUT = 100*60
+timeout = 100*60
+Ned.TIMEOUT = timeout
 
 def unwanted_catalogue(cat_name, banned_cat_list):
     """
@@ -285,9 +287,10 @@ def query_vizier(name, type1, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000',
     # homogenised RA and DEC and return unlimited rows
     if type1=='velocity':
         v = Vizier(columns=["**", RA, DEC], ucd="spect.dopplerVeloc*|phys.veloc*", 
-                   row_limit=-1)
+                   row_limit=-1, timeout=timeout)
     if type1=='redshift':
-        v = Vizier(columns=["**", RA, DEC], ucd="src.redshift*", row_limit=-1)
+        v = Vizier(columns=["**", RA, DEC], ucd="src.redshift*", row_limit=-1,
+                   timeout=timeout)
 
     # Query a region using source name
     cat_list = v.query_region(name, radius=radius)
