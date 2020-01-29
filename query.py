@@ -13,6 +13,18 @@ Ned.TIMEOUT = timeout
 
 
 def run_query(data_path, name, coords):
+    """
+    Query NED and Vizier for spectroscopic redshifts around coordinates of 
+    choice
+    Input: 
+        data_path: location to place the downloaded data
+        name: basename/identifier for field to query
+        coords: coordinates in Astropy format
+        banned_cat_list: list of catalogues that have been deemed banned
+    Output:
+        None; write out fits file with a unique list of redshifts around the
+        target of interest
+    """
     # Set the paths based on the where you want the data to be downloaded and 
     # the identified for the sources/field the redshifts are downloaded for    
     path_concat = f'{data_path}/{name}/{name}_online_redshift.fits'
