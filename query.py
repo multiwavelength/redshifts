@@ -466,18 +466,30 @@ def query_redshift(target, path, name):
     measurements. 
     Input: 
         target: either source name in string format or Astropy coordinate object
+        path: path where to write the fits file with redshifts
+        name: base name for the fits files containing the redshifts (can be the 
+              target name)
     Return:
         stacked table with all redshift measurements. Will most likely contain 
         duplicated sources
     """
+    
     # Query Vizier for redshift columns
     tab_redshift = query_vizier(target, 'redshift')
+    tab_redshift.meta['description'] = u'Vizier redshifts'
+    tab_redshift.write(f'{path}/{name}/{name}_vizier_redshift.fits', 
+                       overwrite=True)
     
     # Query Vizier for velocity columns
     tab_velocity = query_vizier(target, 'velocity')
+    tab_velocity.meta['description'] = u'Vizier velocity'
+    tab_velocity.write(f'{path}/{name}/{name}_vizier_velocity.fits', 
+                       overwrite=True)
     
     # Query NED for redshifts
     tab_NED = query_NED(target)
+    tab_NED.meta['description'] = u'NED'
+    tab_NED.write(f'{path}/{name}/{name}_NED.fits', overwrite=True)
     
     tab_Golovich = query_Golovich(target)
     # Add table to the list only if it not not empty
