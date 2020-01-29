@@ -1,3 +1,4 @@
+import shutil
 from astroquery.vizier import Vizier
 from astroquery.ned import Ned
 from astropy.table import Column, QTable, Table, vstack
@@ -6,8 +7,31 @@ from astropy import units as u
 import astropy.coordinates as coord
 
 import setup_astroquery as sa
+import cross_match_utilities as cmu
 timeout = 100*60
 Ned.TIMEOUT = timeout
+
+
+def run_query(data_path, name, coords):
+    # Set the paths based on the where you want the data to be downloaded and 
+    # the identified for the sources/field the redshifts are downloaded for    
+    path_concat = f'{data_path}/{name}/{name}_online_redshift.fits'
+    path_ident = f'{path_concat.replace(".fits", "")}_ident.fits'
+    path_unique = f'{path_concat.replace(".fits", "")}_ident_unique.fits'
+
+    # Perform the redshift query on Vizier and NED and write to fits file
+    grand_table = query_redshift(coords, data_path, name)
+    grand_table.meta['description'] = u'Vizier and NED redshifts'
+    grand_table.write(path_concat, format='fits', overwrite=True)
+
+    # Identify duplicates and keep only the best redshift measurement
+    duplicates = cmu.identify_duplicates(path_concat, path_ident, 
+                                         RA='RA', DEC='DEC')
+    if duplicates==True:
+        cmu.find_groups_redshift(path_ident, path_unique)
+    else:
+        shutil.copyfile(path_ident, path_unique)
+
 
 def unwanted_catalogue(cat_name, banned_cat_list):
     """
