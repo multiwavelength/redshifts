@@ -1,15 +1,10 @@
 import os
-import shutil
 import warnings
 warnings.filterwarnings("ignore")
-from astropy.io import fits
-from astropy.table import Column, Table, QTable, vstack
-import astropy.units as u
+from astropy.table import QTable
 import astropy.coordinates as coord
 
 import query as q
-from astroquery.vizier import Vizier
-import cross_match_utilities as cmu
 
 # Set the paths where the data will be downloaded
 base_path = f'/home/andra/Desktop/Keep/astroquery'
