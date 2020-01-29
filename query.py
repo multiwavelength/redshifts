@@ -424,7 +424,43 @@ def query_NED(name, radius=sa.radius, RA='RA', DEC='DEC', z=sa.z,
 
     return final_cat
 
-def query_redshift(target):
+def query_Golovich(coords, table='J_ApJS_240_39_table7.dat.fits', 
+                   radius=sa.radius, RAf=sa.RA, DECf=sa.DEC, z=sa.z):
+    """
+    Query the Golovich table around the central coordinates of the source
+    Input:
+        coords: Astropy coordinate structure for the center of the source
+        table: optional, name of Golovich table
+        radius: radius to select a source as associated with the source
+        RAf, DECf, z: name to use for homogenized redshift and coord columns
+    Output:
+        Final table containing 4 columns, RA, DEC, redshift and origin of 
+        redshift measurement, compiled from data in the Golovich table
+    """
+    # Read in table
+    Golovich = Table.read(table)['RAdeg', 'DEdeg', 'zspec']
+
+    # Rename the columns
+    Golovich.rename_column('RAdeg', RAf)
+    Golovich.rename_column('DEdeg', DECf)
+    Golovich.rename_column('zspec', z)
+
+    # Add column identifying the source of the data
+    Golovich.add_column(Column([table.strip('.dat.fits')]*len(Golovich)),
+                        name=sa.origin_name)
+
+    # Select the sources within a radius of the cluster 
+    coords_Golovich = coord.SkyCoord(Golovich[RAf], Golovich[DECf])
+    sep = coords.separation(coords_Golovich)
+    mask = sep < radius
+
+    if sum(mask)==0:
+        return None
+    else:
+        return Golovich[mask]
+
+
+def query_redshift(target, path, name):
     """
     Perform an astroquery search of NED and Vizier for spectroscopic redshift 
     measurements. 
@@ -443,9 +479,10 @@ def query_redshift(target):
     # Query NED for redshifts
     tab_NED = query_NED(target)
     
+    tab_Golovich = query_Golovich(target)
     # Add table to the list only if it not not empty
     cat_list = []
-    for t in [tab_redshift, tab_velocity, tab_NED]:
+    for t in [tab_redshift, tab_velocity, tab_NED, tab_Golovich]:
         if t is not None:
             cat_list.append(t)
     
