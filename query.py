@@ -223,7 +223,7 @@ def process_catalog(type1, cat, RA, DEC, z, RAf, DECf):
 
     # Homogenize column names
     cat.rename_column(final_z_col, z)
-    
+
     # Select only relevant columns: RA, DEC and redshift
     final_cat = cat[RA, DEC, z][~cat[z].mask]
 
