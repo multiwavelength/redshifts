@@ -3,6 +3,13 @@
 This package searches within online astronomy archives Vizier and NED to find all unique spectroscopic redshifts within a designated field. 
 
 ## Usage
+The main functionality of the package can be used by calling the function:
+'''
+query.run_query(data_path, name, coords)
+'''
+where data_path is the location where to place the downloaded data, name is the identifier for the field of interest and
+coords are Astropy coordinates that specify where to point the query.
+ 
 For details on how to use the package, please see main file, [PIPELINE_online_redshift.py](PIPELINE_online_redshift.py)
 
 ## Features and limitations
