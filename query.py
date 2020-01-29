@@ -303,6 +303,7 @@ def remove_potential_photoz(table, z_col=sa.z):
     table.remove_rows(rows_to_remove)
     return table
 
+
 def query_vizier(name, type1, radius=sa.radius, RA='_RAJ2000', DEC='_DEJ2000', 
                  RAf=sa.RA, DECf=sa.DEC, z=sa.z):
     """
