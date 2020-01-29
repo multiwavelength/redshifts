@@ -25,7 +25,7 @@ banned_catalogues = ['glade1', 'glade2', 'IX/31/wgacat', 'VIII/29A/abelclus',
                      'VII/283/catalog', 'VII/258/vv10', 'IX/31/wgacat', 
                      'J/A+A/525/A157', 'J/ApJS/196/11', 'J/A+AS/103/349',
                      'J/ApJS/146/267', 'VII/259/6dfgs', 'VII/69/catalog',
-                     'J/MNRAS/277/1477', 'J/MNRAS/478/1512']
+                     'J/MNRAS/277/1477', 'J/MNRAS/478/1512', 'J/MNRAS/443/1231']
 
 banned_catalogues_velocity = ['glade1', 'glade2', 'I/348/catalog', 'J/A+A/525/A157',
         'II/335/galex_ais', 'II/335/table4', 'V/139/sdss9', 'V/147/sdss12', 
