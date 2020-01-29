@@ -9,9 +9,6 @@ from collections import Counter
 from collections import defaultdict
 
 import setup_astroquery as sa
-#import read_files as rf
-#import constants as const
-#import utilities as u
 
 
 def add_origin(path1):
