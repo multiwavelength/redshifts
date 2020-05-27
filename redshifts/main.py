@@ -4,8 +4,8 @@ import warnings
 warnings.filterwarnings("ignore")
 import click
 
-import redshift.query as q
-import redshift.constants as c
+import redshifts.query as q
+import redshifts.constants as c
 
 
 def redshifts(path, name, RA, DEC, config_path):
