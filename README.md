@@ -30,7 +30,7 @@ The main functionality of the package can be used by calling the function:
 ```
 from redshift.main import redshifts
 
-redshift query.run_query(path, name, RA, DEC, config_file)
+redshifts(path, name, RA, DEC, config_file)
 ```
 where path is the location where to place the downloaded data, name is the identifier for the field of interest, RA and DEC are coordinates that specify where to point the query and config_file is the YAML configuration file.
 
