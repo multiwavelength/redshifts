@@ -1,4 +1,4 @@
-radius: 0.7 degree
+radius: 0.01 degree
 
 # Name of the column used to set the origin of the measurement
 origin: Origin

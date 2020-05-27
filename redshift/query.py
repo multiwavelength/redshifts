@@ -1,11 +1,10 @@
 import os
 from io import BytesIO, StringIO
 import shutil
-import gc
 import operator
 from functools import reduce
-from colorama import Fore
 
+from colorama import Fore
 import numpy as np
 from astroquery.vizier import Vizier
 from astroquery.ned import Ned
