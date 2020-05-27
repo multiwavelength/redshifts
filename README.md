@@ -6,7 +6,7 @@
 
 ## Features
 - Flexible search within a radius of a given set of (RA, DEC) coordinates
-- Uses column names and descriptions (including columns contents input, UCD in Vizier) to identify columns containing spectroscopic redshifts or velocities
+- Uses column names and descriptions (including UCD keywords) to identify columns containing spectroscopic redshifts or velocities
 - Weeds out photometric redshifts and duplicates and returns a unique list of "best" spectroscopic redshift measurements.
 
 ## Usage
