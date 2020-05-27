@@ -54,8 +54,8 @@ banned_catalogs_velocity:
 The search will be performed from the specified RA & DEC position out to the radius from the configuration file. The uncertainty is used to evaluate whether redshifts could be photometric instead of spectroscopic. The banned catalogs encompass any Vizier catalogs one does not want included in the search, for example because they were found to mix spectroscopic and photometric redshifts in one column.
 
 ## Limitations
-The package relies on the original authors correctly using the UCD and other column names. However, there are clear cases of misuse, where labels reserved for spectroscopic redshifts contained photometric redshift. To remedy this, the package contains a list of "banned" catalogs, which was compiled by hand by inspecting catalogues that obviously misused column names and labels. The package also contains a list of banned keywords, that attempt to remove column that might contain redshift information, but not actual spectroscopic redshift measurements for individual sources.
-
+The package relies on the original authors correctly using the UCD and other column names. Unfortunately, there are cases of misuse, where labels reserved for spectroscopic redshifts contained photometric redshifts. To remedy this, the package contains a list of "banned" catalogs, which can be compiled by hand by inspecting catalogues. 
+For wide area searches (i.e. large radius), NED and Vizier sometimes time out. Additionally, the search requires a stable internet connection and can fail if the connection is interrupted during the search.
 
 ## Installation requirements
 
