@@ -21,7 +21,7 @@ def redshifts(path, name, RA, DEC, config_path):
 @click.option(
     "--config", default="redshiftconfig.yaml", help="Configuration file in YAML format."
 )
-@click.option("--name", default="", help="Target name.")
+@click.option("--name", default="target", help="Target name.")
 @click.option(
     "--RA", default="", help="Right ascension, with units: e.g. 150d, 150deg, 12h"
 )
