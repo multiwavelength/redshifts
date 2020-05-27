@@ -18,38 +18,38 @@ import astropy.coordinates as coord
 timeout = 100 * 60
 Ned.TIMEOUT = timeout
 
+VELOCITY_SRC = "spect.dopplerVeloc*|phys.veloc*"
+VELOCITY_KEYS = [
+    "VELOC_BARYCENTER",
+    "VELOC_HC",
+    "VELOC_CMB",
+    "VELOC_LG",
+    "VELOC_LSR",
+    "VELOC_GC",
+]
+REDSHIFT_SRC = "src.redshift*"
+REDSHIFT_KEYS = ["REDSHIFT_HC"]
+NED_FLAGS = [
+    b"::",
+    b"?",
+    b"CONT",
+    b"EST",
+    b"FoF",
+    b"LUM",
+    b"MFA",
+    b"MOD",
+    b"PHOT",
+    b"PEAK",
+    b"PRED",
+    b"SED",
+    b"TENT",
+    b"TOMO",
+]
+NED_TYPES = [b"QGroup", b"GClstr", b"GGroup", b"GPair", b"GTrpl", b"Other", b"PofG"]
 
-def run_query(data_path, name, coords):
-    """
-    Query NED and Vizier for spectroscopic redshifts around coordinates of 
-    choice
-    Input: 
-        data_path: location to place the downloaded data
-        name: basename/identifier for field to query
-        coords: coordinates in Astropy format
-        banned_cat_list: list of catalogues that have been deemed banned
-    Output:
-        None; write out fits file with a unique list of redshifts around the
-        target of interest
-    """
-    # Set the paths based on the where you want the data to be downloaded and 
-    # the identified for the sources/field the redshifts are downloaded for    
-    path_concat = f'{data_path}/{name}/{name}_online_redshift.fits'
-    path_ident = f'{path_concat.replace(".fits", "")}_ident.fits'
-    path_unique = f'{path_concat.replace(".fits", "")}_ident_unique.fits'
+HARD_SELECTION = ["spectroscopic", "Spectroscopic"]
 
-    # Perform the redshift query on Vizier and NED and write to fits file
-    grand_table = query_redshift(coords, data_path, name)
-    grand_table.meta['description'] = u'Vizier and NED redshifts'
-    grand_table.write(path_concat, format='fits', overwrite=True)
-
-    # Identify duplicates and keep only the best redshift measurement
-    duplicates = cmu.identify_duplicates(path_concat, path_ident, 
-                                         RA='RA', DEC='DEC')
-    if duplicates==True:
-        cmu.find_groups_redshift(path_ident, path_unique)
-    else:
-        shutil.copyfile(path_ident, path_unique)
+BANNED_KEYWORDS = ["cluster", "Cluster", "Photometric", "photometric"]
 
 
 def unwanted_catalogue(cat_name, banned_cat_list):
