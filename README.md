@@ -28,7 +28,7 @@ redshifts --help
 
 The main functionality of the package can be used by calling the function:
 ```
-from redshift.main import redshifts
+from redshifts.main import redshifts
 
 redshifts(path, name, RA, DEC, config_file)
 ```
