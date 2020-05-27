@@ -156,7 +156,9 @@ def set_unwanted_list(type1, config):
         return config.banned_catalogs_velocity
 
 
-def process_catalog(type1, cat, config, RA, DEC):
+def process_catalog(
+    type1, cat, config, RA, DEC, z="Redshift", RAf="RA", DECf="DEC", origin="Origin"
+):
     """
     Take an downloaded Vizier catalogue and extract RA, DEC and a redshift 
     column, if possible
@@ -190,19 +192,17 @@ def process_catalog(type1, cat, config, RA, DEC):
         return None
 
     # Homogenize column names
-    cat.rename_column(final_z_col, config.z)
+    cat.rename_column(final_z_col, z)
 
     # Select only relevant columns: RA, DEC and redshift
-    final_cat = cat[RA, DEC, config.z][~cat[config.z].mask]
+    final_cat = cat[RA, DEC, z][~cat[z].mask]
 
     # Rename the coord columns with chosen names
-    final_cat.rename_column(RA, config.RA)
-    final_cat.rename_column(DEC, config.DEC)
+    final_cat.rename_column(RA, RAf)
+    final_cat.rename_column(DEC, DECf)
 
     # Add Vizier catalog name to the table for future reference
-    final_cat.add_column(
-        Column([cat.meta["name"]] * len(final_cat)), name=config.origin
-    )
+    final_cat.add_column(Column([cat.meta["name"]] * len(final_cat)), name=origin)
 
     # Add to master list of tables
     return final_cat
@@ -277,9 +277,7 @@ def prelim_selection(cat_vot, type1, RA, DEC, KEYS):
     return cat_list
 
 
-def query_vizier(
-    name, type1, config, RA="_RAJ2000", DEC="_DEJ2000",
-):
+def query_vizier(name, type1, config, RA="_RAJ2000", DEC="_DEJ2000", z="Redshift"):
     """
     Use astroquery to query the Vizier catalogue database
     Input:
@@ -331,7 +329,7 @@ def query_vizier(
         grand_table = vstack(table_list)
 
         # Remove potential photoz's by removing measurements with little precision
-        grand_table = remove_potential_photoz(grand_table, config.z)
+        grand_table = remove_potential_photoz(grand_table, z)
 
         # Return results of the vizier search
         return grand_table
@@ -409,7 +407,14 @@ def redshift_type(line, RA, DEC, un):
 
 
 def query_NED(
-    name, config, RA="RA", DEC="DEC",
+    name,
+    config,
+    RA="RA",
+    DEC="DEC",
+    z="Redshift",
+    RAf="RA",
+    DECf="DEC",
+    origin="Origin",
 ):
     """
     Use astroquery to query the NED database
@@ -446,12 +451,12 @@ def query_NED(
     final_cat = vstack(row_list)
 
     # Rename columns to match general choice
-    final_cat.rename_column("Redshift", config.z)
-    final_cat.rename_column(RA, config.RA)
-    final_cat.rename_column(DEC, config.DEC)
+    final_cat.rename_column("Redshift", z)
+    final_cat.rename_column(RA, RAf)
+    final_cat.rename_column(DEC, DECf)
 
     # Add origin column as NED
-    final_cat.add_column(Column(["NED"] * len(final_cat)), name=config.origin)
+    final_cat.add_column(Column(["NED"] * len(final_cat)), name=origin)
 
     return final_cat
 
@@ -499,7 +504,7 @@ def query_redshift(target, path, name, config):
         exit()
 
 
-def run_query(data_path, name, RA, DEC, config):
+def run_query(data_path, name, RA, DEC, config, z="Redshift"):
     """
     Query NED and Vizier for spectroscopic redshifts around coordinates of 
     choice
@@ -533,7 +538,7 @@ def run_query(data_path, name, RA, DEC, config):
     # Identify duplicates and keep only the best redshift measurement
     duplicates = identify_duplicates(path_concat, path_ident, RA="RA", DEC="DEC")
     if duplicates == True:
-        find_groups_redshift(path_ident, path_unique, config.redshift)
+        find_groups_redshift(path_ident, path_unique, z)
     else:
         shutil.copyfile(path_ident, path_unique)
 

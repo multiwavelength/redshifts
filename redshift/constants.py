@@ -27,10 +27,6 @@ class Angle(Quantity):
 @dataclass
 class Setup:
     radius: Angle
-    origin: str
-    z: str
-    RA: str
-    DEC: str
     uncertainty: float
     banned_catalogs_redshift: List[str]
     banned_catalogs_velocity: List[str]

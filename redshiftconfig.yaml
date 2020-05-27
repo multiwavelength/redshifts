@@ -1,11 +1,7 @@
-radius: 0.01 degree
+# Search radius
+radius: 2 arcmin
 
-# Name of the column used to set the origin of the measurement
-origin: Origin
-# Final names for redshift, RA and DEC columns
-z: Redshift
-RA: RA
-DEC: DEC
+# Uncertainty in redshift to classify a measurement as photometric
 uncertainty: 0.002
 
 banned_catalogs_redshift:
