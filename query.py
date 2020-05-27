@@ -490,9 +490,142 @@ def query_redshift(target, path, name, config):
         tab_velocity.write(f"{path}/{name}/{name}_vizier_velocity.fits", overwrite=True)
 
     # Add table to the list only if it not not empty
-    cat_list = []
-    for t in [tab_redshift, tab_velocity, tab_NED, tab_Golovich]:
-        if t is not None:
-            cat_list.append(t)
-    
-    return vstack(cat_list)
+    cat_list = [t for t in [tab_redshift, tab_velocity, tab_NED] if t is not None]
+    if cat_list:
+        return vstack(cat_list)
+    else:
+        print(
+            Fore.YELLOW + f"Warning: no spectroscopic redshifts found in search area."
+        )
+        exit()
+
+
+def run_query(data_path, name, RA, DEC, config):
+    """
+    Query NED and Vizier for spectroscopic redshifts around coordinates of 
+    choice
+    Input: 
+        data_path: location to place the downloaded data
+        name: basename/identifier for field to query
+        coords: coordinates in Astropy format
+        config: configuration, including search radius, list of catalogues that 
+                have been deemed banned
+    Output:
+        None; write out fits file with a unique list of redshifts around the
+        target of interest
+    """
+    # Set the paths based on the where you want the data to be downloaded and
+    # the identified for the sources/field the redshifts are downloaded for
+    if not os.path.exists(f"{data_path}/{name}"):
+        os.makedirs(f"{data_path}/{name}")
+    path_concat = f"{data_path}/{name}/{name}_online_redshift.fits"
+    path_ident = f'{path_concat.replace(".fits", "")}_ident.fits'
+    path_unique = f'{path_concat.replace(".fits", "")}_ident_unique.fits'
+
+    # Build coordinates
+    coords = coord.SkyCoord(RA, DEC)
+
+    # Perform the redshift query on Vizier and NED and write to fits file
+    grand_table = query_redshift(coords, data_path, name, config)
+
+    grand_table.meta["description"] = "Vizier and NED redshifts"
+    grand_table.write(path_concat, format="fits", overwrite=True)
+
+    # Identify duplicates and keep only the best redshift measurement
+    duplicates = identify_duplicates(path_concat, path_ident, RA="RA", DEC="DEC")
+    if duplicates == True:
+        find_groups_redshift(path_ident, path_unique, config.redshift)
+    else:
+        shutil.copyfile(path_ident, path_unique)
+
+
+def identify_duplicates(file1, outname, RA="RA", DEC="DEC", dist=1):
+    """
+    Within a single file,identify using STITLS whether there are any sources 
+    with multiple redshift measurements
+    Input: 
+        file1: name of the file containing all the info on the targets. Must 
+               contain RA and DEC under the names "RA" and "DEC"
+        outname: preferred name for the output file. This will contain 2 extra
+                 columns which describe whether the source has "duplicate" and
+                 another which says how many duplicates exist in the group (this
+                 will usually be 2, from 1 source with 2 measurements)
+        RA, DEC: preferred names to be set for the RA and DEC column
+        dist: distance in arcsec to be used for the crossmatch
+    Output:
+        return True if duplicates were found, False if no duplicates were found
+        fits file with name outname which marks the duplicate sources   
+    """
+    command = (
+        f'stilts tmatch1 matcher=sky values="{RA} {DEC}" params={dist} '
+        + f"action=identify in={file1} out={outname}"
+    )
+    try:
+        subprocess.check_output(command, shell=True, executable="/bin/zsh")
+        return True
+    except:
+        shutil.copyfile(file1, outname)
+        return False
+
+
+def list_duplicates(seq):
+    """
+    Find groups of duplicated values in a sequence
+    Input:
+        seq: list of values
+    Output:
+        return a list of unique group of duplicate values 
+    """
+    tally = defaultdict(list)
+    for i, item in enumerate(seq):
+        try:
+            if item.mask == True:
+                continue
+        except:
+            tally[item].append(i)
+    return ((key, locs) for key, locs in tally.items() if len(locs) > 1)
+
+
+def find_groups_redshift(file1, outfile, z):
+    """
+    Search through the GroupID column of the fits table and list duplicates and
+    their row id. The GroupID identifies pairs/triplets/groups of same sources
+    which have multiple redshift estimations.
+    Input:
+        file1: master file with all the redshift for a cluster. May contain 
+               duplicates from sources with multiple redshift measurements
+    Output:
+        fits file with unique sources 
+    """
+
+    table = Table.read(file1, hdu=1)
+    ids = table["GroupID"]
+    indeces_remove = []
+
+    # Iterate through the grouped sources
+    for dup in sorted(list_duplicates(ids)):
+        if dup[0] < 0:
+            continue  # ignore negative ids which act as fillers for
+        # unique sources with no matches
+        # Find groups of sources
+        grouped_sources = table[dup[1]]
+
+        # Make a list of the length of the redshift as a proxy for the precision
+        # of the redshift measurement
+        significance = np.array(
+            [len(format(source[z], "f").rstrip("0")) for source in grouped_sources]
+        )
+        # Remove the source with the most precision and add the rest to the list
+        # of sources to be removed
+        del dup[1][np.argmax(significance)]
+        index_source_to_remove = dup[1]
+
+        # Append all indeces to be removed from the list
+        indeces_remove = indeces_remove + index_source_to_remove
+
+    # Remove the lines corresponding to the sources chosen for removal through
+    # the process described above
+    table.remove_rows(np.array(indeces_remove))
+
+    # Write out a new fits file containing only unique sources
+    table.write(outfile, format="fits", overwrite=True)
