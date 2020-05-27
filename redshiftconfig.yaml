@@ -1,0 +1,51 @@
+radius: 0.7 degree
+
+# Name of the column used to set the origin of the measurement
+origin: Origin
+# Final names for redshift, RA and DEC columns
+z: Redshift
+RA: RA
+DEC: DEC
+uncertainty: 0.002
+
+banned_catalogs_redshift:
+  - glade1
+  - glade2
+  - VIII/29A/abelclus
+  - J/A+A/425/367/reflex50
+  - J/A+A/425/367/reflex70
+  - VII/283/catalog
+  - VII/258/vv10
+  - J/ApJS/196/11
+  - J/A+AS/103/349
+  - J/ApJS/146/267
+  - VII/259/6dfgs
+  - VII/69/catalog
+  - J/MNRAS/277/1477
+  - J/MNRAS/478/1512
+  - J/MNRAS/450/3665/lc2all
+  - J/ApJ/852/72/mockgals
+  - IX/31/wgacat
+  - J/MNRAS/468/3322/table3
+  - J/MNRAS/468/3322/table4
+  - J/MNRAS/468/3322/table5
+  - J/MNRAS/468/3322/table6
+  - J/ApJS/221/12/table1
+  - J/A+A/534/A109/mcxc
+banned_catalogs_velocity:
+  - VIII/7A/catalog
+  - VIII/11/catalog
+  - J/A+A/531/A165/param
+  - J/AJ/149/171/table3
+  - J/ApJ/849/20/eco
+  - J/ApJS/141/503/table1
+  - J/ApJS/172/599/table3
+  - J/MNRAS/329/87/table1
+  - J/MNRAS/443/1231/FPsample
+  - J/ApJ/852/72/mockgals
+  - IX/31/wgacat
+  - J/MNRAS/468/3322/table3
+  - J/MNRAS/468/3322/table4
+  - J/MNRAS/468/3322/table5
+  - J/MNRAS/468/3322/table6
+  - J/ApJS/221/12/table1
