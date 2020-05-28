@@ -1,6 +1,8 @@
 import os
 from io import BytesIO, StringIO
 import shutil
+import subprocess
+from collections import defaultdict
 import operator
 from functools import reduce
 
@@ -325,7 +327,7 @@ def query_vizier(name, type1, config, RA="_RAJ2000", DEC="_DEJ2000", z="Redshift
             table_list.append(final_cat)
 
     # Stack all the final catalogues with the relevant data
-    try:
+    if table_list:
         grand_table = vstack(table_list)
 
         # Remove potential photoz's by removing measurements with little precision
@@ -333,7 +335,7 @@ def query_vizier(name, type1, config, RA="_RAJ2000", DEC="_DEJ2000", z="Redshift
 
         # Return results of the vizier search
         return grand_table
-    except:
+    else:
         return None
 
 
