@@ -482,19 +482,19 @@ def query_redshift(target, path, name, config):
     if tab_NED is not None:
         tab_NED.meta["description"] = "NED"
         tab_NED.write(f"{path}/{name}/{name}_NED.fits", overwrite=True)
-    print('Done querying NED...')
+    print("Done querying NED...")
     # Query Vizier for redshift columns
     tab_redshift = query_vizier(target, "redshift", config)
     if tab_redshift is not None:
         tab_redshift.meta["description"] = "Vizier redshifts"
         tab_redshift.write(f"{path}/{name}/{name}_vizier_redshift.fits", overwrite=True)
-    print('Done quering Vizier for redshifts...')
+    print("Done quering Vizier for redshifts...")
     # Query Vizier for velocity columns
     tab_velocity = query_vizier(target, "velocity", config)
     if tab_velocity is not None:
         tab_velocity.meta["description"] = "Vizier velocity"
         tab_velocity.write(f"{path}/{name}/{name}_vizier_velocity.fits", overwrite=True)
-    print('Done querying Vizier for velocities...')
+    print("Done querying Vizier for velocities...")
 
     # Add table to the list only if it not not empty
     cat_list = [t for t in [tab_redshift, tab_velocity, tab_NED] if t is not None]

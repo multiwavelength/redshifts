@@ -5,6 +5,7 @@ from typing import List
 from pydantic.dataclasses import dataclass
 from astropy import units as u
 
+
 class Quantity(u.SpecificTypeQuantity):
     """
     Validation of the types of unit for each parameter, to ensure the right type
