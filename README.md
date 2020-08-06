@@ -4,6 +4,8 @@
 
 **redshifts** is a Python package which collects all unique spectroscopic redshifts from online databases such as Vizier and NED. 
 
+[![DOI](https://zenodo.org/badge/237040021.svg)](https://zenodo.org/badge/latestdoi/237040021)
+
 ## Features
 - Flexible search within a radius of a given set of (RA, DEC) coordinates
 - Uses column names and descriptions (including UCD keywords) to identify columns containing spectroscopic redshifts or velocities
@@ -14,7 +16,6 @@
 To run **redshifts**, the following are needed:
 - A configuration file, in YAML format, to specify things like the search radius, column names and banned catalogs
 Details on the input file can be found further down. An example configuration file is contained within the git repository.
-
 
 The output of **redshifts** include:
 - A fits table with unique spectroscopic redshifts
