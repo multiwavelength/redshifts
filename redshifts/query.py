@@ -408,6 +408,10 @@ def redshift_type(line, RA, DEC, un):
         return None
 
 
+class NedQueryFailed(Exception):
+    pass
+
+
 def query_NED(
     name,
     config,
@@ -430,7 +434,12 @@ def query_NED(
         redshift measurement, compiled from all data available of Vizier
     """
     # Query NED for the region around source within radius
-    ned_result = Ned.query_region_async(name, radius=config.radius).text.encode()
+    try:
+        ned_result = Ned.query_region_async(name, radius=config.radius).text.encode()
+    except Exception as e:
+        print(e)
+        raise NedQueryFailed()
+
     cat_vot = parse(BytesIO(ned_result), pedantic=False, invalid="mask")
     cat_vot = cat_vot.get_first_table().to_table(use_names_over_ids=True)
 
